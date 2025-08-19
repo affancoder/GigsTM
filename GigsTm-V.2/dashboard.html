@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - GigsTM</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #4F46E5; }
+        body { background-color: #F9FAFB; }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-md fixed h-full">
+            <div class="p-4 border-b">
+                <img src="./GigsTm_files/lgo_project1.png" alt="GigsTM" class="h-10">
+            </div>
+            <nav class="mt-4">
+                <a href="#" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 border-r-4 border-blue-500">
+                    <i class="fas fa-user w-6"></i>
+                    <span class="ml-3">Profile</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-file-alt w-6"></i>
+                    <span class="ml-3">Documents</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-cog w-6"></i>
+                    <span class="ml-3">Settings</span>
+                </a>
+                <a href="#" id="logout-btn" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-sign-out-alt w-6"></i>
+                    <span class="ml-3">Logout</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 ml-64 p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold">Dashboard</h1>
+                <div id="user-avatar" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold">--</div>
+            </div>
+
+            <!-- Profile Card -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Profile Information</h2>
+                    <button id="edit-profile-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-edit mr-2"></i> Edit Profile
+                    </button>
+                </div>
+                <div class="p-6" id="profile-content">
+                    <div class="animate-pulse">Loading profile data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Logout handler
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'index.html';
+            });
+
+            // Load profile data
+            try {
+                const response = await fetch(`${window.API_BASE_URL || 'http://localhost:3001/api'}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load profile');
+                const { data: profile } = await response.json();
+                renderProfile(profile);
+                localStorage.setItem('userProfile', JSON.stringify(profile));
+                
+            } catch (error) {
+                console.error('Error:', error);
+                const savedProfile = localStorage.getItem('userProfile');
+                if (savedProfile) renderProfile(JSON.parse(savedProfile));
+                else document.getElementById('profile-content').innerHTML = 'Failed to load profile';
+            }
+
+            // Edit profile button
+            document.getElementById('edit-profile-btn').addEventListener('click', () => {
+                window.location.href = 'userform.html';
+            });
+        });
+
+        function renderProfile(profile) {
+            if (!profile) return;
+            const { personalInfo, address } = profile;
+            
+            // Set user avatar
+            const initials = personalInfo?.name 
+                ? personalInfo.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                : '--';
+            document.getElementById('user-avatar').textContent = initials;
+
+            // Format date
+            const formatDate = (dateString) => {
+                if (!dateString) return 'Not specified';
+                return new Date(dateString).toLocaleDateString();
+            };
+
+            // Create profile content
+            document.getElementById('profile-content').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Personal Info -->
+                    <div class="col-span-1">
+                        <h3 class="text-lg font-semibold mb-4 pb-2 border-b">Personal Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Full Name</p>
+                                <p class="font-medium">${personalInfo?.name || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Email</p>
+                                <p class="font-medium">${personalInfo?.email || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Mobile</p>
+                                <p class="font-medium">${personalInfo?.mobile || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Job Role</p>
+                                <p class="font-medium">${personalInfo?.jobRole || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Date of Birth</p>
+                                <p class="font-medium">${personalInfo?.dob ? formatDate(personalInfo.dob) : 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-span-1">
+                        <h3 class="text-lg font-semibold mb-4 pb-2 border-b">Address</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Street</p>
+                                <p class="font-medium">${address?.street || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">City</p>
+                                <p class="font-medium">${address?.city || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">State</p>
+                                <p class="font-medium">${address?.state || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Country</p>
+                                <p class="font-medium">${address?.country || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Pincode</p>
+                                <p class="font-medium">${address?.pincode || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documents -->
+                    <div class="col-span-1">
+                        <h3 class="text-lg font-semibold mb-4 pb-2 border-b">Documents</h3>
+                        <div class="space-y-4">
+                            <div class="border rounded p-4">
+                                <p class="text-sm text-gray-500">Aadhaar Card</p>
+                                <p class="font-medium">${profile.files?.aadhaarFile ? 'Uploaded' : 'Not uploaded'}</p>
+                            </div>
+                            <div class="border rounded p-4">
+                                <p class="text-sm text-gray-500">PAN Card</p>
+                                <p class="font-medium">${profile.files?.panFile ? 'Uploaded' : 'Not uploaded'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
