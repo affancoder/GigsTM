@@ -2,7 +2,7 @@
 const ORIGIN = window.location.origin;
 const BASE_URL = (window.API_BASE_URL) 
     ? window.API_BASE_URL 
-    : (ORIGIN && ORIGIN.startsWith('http') ? ORIGIN + '/api' : 'http://localhost:3001/api');
+    : (ORIGIN && ORIGIN.startsWith('http') ? ORIGIN + '/api' : '/api');
 
 // Helper function to format date to YYYY-MM-DD
 function formatDate(dateString) {

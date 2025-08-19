@@ -102,8 +102,8 @@ const startServer = async () => {
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📱 Frontend available at: http://localhost:${PORT}`);
-      console.log(`🔐 API endpoints available at: http://localhost:${PORT}/api/auth`);
+      console.log(`📱 Frontend available at: /`);
+      console.log(`🔐 API endpoints available at: /api/auth`);
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err.message);

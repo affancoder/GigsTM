@@ -195,12 +195,12 @@
         const origin = window.location.origin;
         const API_BASE_URL_LOCAL = origin && origin.startsWith('http')
             ? origin + '/api'
-            : 'http://localhost:3001/api';
+            : '/api';
         
         // Helper function to make API calls
         async function makeRequest(endpoint, method = 'GET', data = null) {
             try {
-                const baseUrl = window.API_BASE_URL || API_BASE_URL_LOCAL;
+                const baseUrl = API_BASE_URL_LOCAL;
                 console.log(`Making ${method} request to ${baseUrl}${endpoint}`);
                 const headers = {
                     'Content-Type': 'application/json'

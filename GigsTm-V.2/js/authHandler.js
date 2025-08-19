@@ -1,5 +1,5 @@
 // API base URL
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = '/api';
 // expose for inline scripts that may check window.API_BASE_URL
 window.API_BASE_URL = API_BASE_URL;
 
