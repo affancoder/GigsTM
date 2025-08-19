@@ -53,7 +53,6 @@ exports.register = asyncHandler(async (req, res, next) => {
         }
     });
 });
-};
 
 // @desc    Login user
 // @route   POST /api/auth/login
