@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - GigsTM</title>
+    <title>User Dashboard - GigsTM</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #4F46E5; }
         body { background-color: #F9FAFB; }
+        .sidebar { width: 250px; }
+        .main-content { margin-left: 250px; }
+        @media (max-width: 768px) {
+            .sidebar, .main-content { width: 100%; margin-left: 0; }
+        }
     </style>
 </head>
 <body class="font-sans">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-md fixed h-full">
+        <div class="sidebar bg-white shadow-md fixed h-full">
             <div class="p-4 border-b">
                 <img src="./GigsTm_files/lgo_project1.png" alt="GigsTM" class="h-10">
             </div>
             <nav class="mt-4">
                 <a href="#" class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 border-r-4 border-blue-500">
-                    <i class="fas fa-user w-6"></i>
-                    <span class="ml-3">Profile</span>
+                    <i class="fas fa-users w-6"></i>
+                    <span class="ml-3">All Users</span>
                 </a>
-                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-file-alt w-6"></i>
-                    <span class="ml-3">Documents</span>
+                <a href="userform.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-user-plus w-6"></i>
+                    <span class="ml-3">Add New User</span>
                 </a>
-                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-cog w-6"></i>
-                    <span class="ml-3">Settings</span>
-                </a>
-                <a href="#" id="logout-btn" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                <a href="#" id="logout-btn" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 mt-auto">
                     <i class="fas fa-sign-out-alt w-6"></i>
                     <span class="ml-3">Logout</span>
                 </a>
@@ -39,161 +40,283 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 ml-64 p-8">
+        <div class="main-content flex-1 p-8">
             <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-bold">Dashboard</h1>
-                <div id="user-avatar" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold">--</div>
+                <h1 class="text-2xl font-bold">User Management Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <div id="user-avatar" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold">A</div>
+                    <span id="user-email" class="text-gray-700">Loading...</span>
+                </div>
             </div>
 
-            <!-- Profile Card -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <!-- Users Table -->
+            <div class="bg-white rounded-lg shadow overflow-hidden">
                 <div class="p-6 border-b flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">Profile Information</h2>
-                    <button id="edit-profile-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
-                        <i class="fas fa-edit mr-2"></i> Edit Profile
-                    </button>
+                    <h2 class="text-xl font-semibold">All Users</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" id="search-users" placeholder="Search users..." 
+                                   class="pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button id="refresh-users" class="p-2 text-gray-600 hover:text-blue-600">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="p-6" id="profile-content">
-                    <div class="animate-pulse">Loading profile data...</div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                    <div class="flex flex-col items-center justify-center space-y-2">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                        <p>Loading user data...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Logout handler
-            document.getElementById('logout-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.removeItem('token');
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userProfile');
-                window.location.href = 'index.html';
-            });
-
-            // Load profile data
-            try {
-                const response = await fetch(`/api/profile`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) throw new Error('Failed to load profile');
-                const { data: profile } = await response.json();
-                renderProfile(profile);
-                localStorage.setItem('userProfile', JSON.stringify(profile));
-                
-            } catch (error) {
-                console.error('Error:', error);
-                const savedProfile = localStorage.getItem('userProfile');
-                if (savedProfile) renderProfile(JSON.parse(savedProfile));
-                else document.getElementById('profile-content').innerHTML = 'Failed to load profile';
-            }
-
-            // Edit profile button
-            document.getElementById('edit-profile-btn').addEventListener('click', () => {
-                window.location.href = 'userform.html';
-            });
-        });
-
-        function renderProfile(profile) {
-            if (!profile) return;
-            const { personalInfo, address } = profile;
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const usersTableBody = document.getElementById('users-table-body');
+            const searchInput = document.getElementById('search-users');
+            const refreshBtn = document.getElementById('refresh-users');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userEmail = document.getElementById('user-email');
             
-            // Set user avatar
-            const initials = personalInfo?.name 
-                ? personalInfo.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
-                : '--';
-            document.getElementById('user-avatar').textContent = initials;
+            // State
+            let allUsers = [];
 
-            // Format date
-            const formatDate = (dateString) => {
-                if (!dateString) return 'Not specified';
-                return new Date(dateString).toLocaleDateString();
+            // Initialize the dashboard
+            const initDashboard = async () => {
+                await updateUserInfo();
+                await loadUsers();
+                setupEventListeners();
             };
 
-            // Create profile content
-            document.getElementById('profile-content').innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Personal Info -->
-                    <div class="col-span-1">
-                        <h3 class="text-lg font-semibold mb-4 pb-2 border-b">Personal Information</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-sm text-gray-500">Full Name</p>
-                                <p class="font-medium">${personalInfo?.name || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Email</p>
-                                <p class="font-medium">${personalInfo?.email || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Mobile</p>
-                                <p class="font-medium">${personalInfo?.mobile || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Job Role</p>
-                                <p class="font-medium">${personalInfo?.jobRole || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Date of Birth</p>
-                                <p class="font-medium">${personalInfo?.dob ? formatDate(personalInfo.dob) : 'N/A'}</p>
-                            </div>
-                        </div>
-                    </div>
+            // Load users from the server
+            const loadUsers = async () => {
+                try {
+                    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                    if (!token) {
+                        window.location.href = 'index.html';
+                        return;
+                    }
 
-                    <!-- Address -->
-                    <div class="col-span-1">
-                        <h3 class="text-lg font-semibold mb-4 pb-2 border-b">Address</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-sm text-gray-500">Street</p>
-                                <p class="font-medium">${address?.street || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">City</p>
-                                <p class="font-medium">${address?.city || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">State</p>
-                                <p class="font-medium">${address?.state || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Country</p>
-                                <p class="font-medium">${address?.country || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Pincode</p>
-                                <p class="font-medium">${address?.pincode || 'N/A'}</p>
-                            </div>
-                        </div>
-                    </div>
+                    const response = await fetch('/api/profile/all', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-                    <!-- Documents -->
-                    <div class="col-span-1">
-                        <h3 class="text-lg font-semibold mb-4 pb-2 border-b">Documents</h3>
-                        <div class="space-y-4">
-                            <div class="border rounded p-4">
-                                <p class="text-sm text-gray-500">Aadhaar Card</p>
-                                <p class="font-medium">${profile.files?.aadhaarFile ? 'Uploaded' : 'Not uploaded'}</p>
+                    if (response.status === 403) {
+                        // User doesn't have admin access
+                        usersTableBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center">
+                                    <div class="flex flex-col items-center justify-center space-y-4">
+                                        <i class="fas fa-lock text-4xl text-yellow-500"></i>
+                                        <p class="text-lg font-medium">Admin Access Required</p>
+                                        <p class="text-gray-500">You don't have permission to view all users.</p>
+                                        <a href="userform.html" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                                            Go to My Profile
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'Failed to load users');
+                    }
+                    
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        allUsers = result.data;
+                        renderUsers(allUsers);
+                    }
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                    usersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-red-500">
+                                Error loading users: ${error.message}
+                            </td>
+                        </tr>`;
+                }
+            };
+
+            // Render users in the table
+            const renderUsers = (users) => {
+                if (!users || users.length === 0) {
+                    usersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                No users found
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                usersTableBody.innerHTML = users.map(user => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span class="text-blue-600 font-medium">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${user.name || 'N/A'}</div>
+                                    <div class="text-sm text-gray-500">${user.role || 'user'}</div>
+                                </div>
                             </div>
-                            <div class="border rounded p-4">
-                                <p class="text-sm text-gray-500">PAN Card</p>
-                                <p class="font-medium">${profile.files?.panFile ? 'Uploaded' : 'Not uploaded'}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${user.email || 'N/A'}</div>
+                            <div class="text-sm text-gray-500">${user.mobile || 'N/A'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${user.role === 'admin' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                                ${user.role || 'user'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="viewUserDetails('${user._id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="editUser('${user._id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteUser('${user._id}')" class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            };
+
+            // Setup event listeners
+            const setupEventListeners = () => {
+                // Search functionality
+                searchInput?.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filtered = allUsers.filter(user => 
+                        (user.name && user.name.toLowerCase().includes(searchTerm)) ||
+                        (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+                        (user.mobile && user.mobile.includes(searchTerm))
+                    );
+                    renderUsers(filtered);
+                });
+
+                // Refresh button
+                refreshBtn?.addEventListener('click', loadUsers);
+
+                // Logout button
+                logoutBtn?.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'index.html';
+                });
+            };
+
+            // Update user info in the header
+            const updateUserInfo = async () => {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                if (!token) {
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                
+                try {
+                    // Parse the JWT token to get user info
+                    const tokenParts = token.split('.');
+                    if (tokenParts.length !== 3) throw new Error('Invalid token format');
+                    
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    const userEmailElement = document.getElementById('user-email');
+                    const userAvatar = document.getElementById('user-avatar');
+                    
+                    if (userEmailElement) {
+                        userEmailElement.textContent = payload.email || 'User';
+                    }
+                    
+                    if (userAvatar && payload.email) {
+                        userAvatar.textContent = payload.email.charAt(0).toUpperCase();
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error updating user info:', error);
+                    return false;
+                }
+            };
+
+            // Global functions for user actions
+            window.viewUserDetails = (userId) => {
+                const user = allUsers.find(u => u._id === userId);
+                if (user) {
+                    alert(`Viewing details for: ${user.name || 'User'}`);
+                    // In a real app, you would open a modal or navigate to a details page
+                }
+            };
+
+            window.editUser = (userId) => {
+                window.location.href = `userform.html?edit=${userId}`;
+            };
+
+            window.deleteUser = async (userId) => {
+                if (confirm('Are you sure you want to delete this user?')) {
+                    try {
+                        const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                        const response = await fetch(`/api/profile/${userId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            alert('User deleted successfully');
+                            loadUsers();
+                        } else {
+                            throw new Error('Failed to delete user');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                        alert('Error deleting user: ' + error.message);
+                    }
+                }
+            };
+
+            // Initialize the dashboard
+            initDashboard();
+        });
     </script>
 </body>
 </html>

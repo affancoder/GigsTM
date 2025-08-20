@@ -87,3 +87,37 @@ exports.getProfile = async (req, res) => {
         });
     }
 };
+
+// Get all users' profiles
+exports.getAllProfiles = async (req, res) => {
+    try {
+        // Get all users with their profiles (removed admin restriction)
+        const users = await User.find({})
+            .select('fullName email phoneNumber role createdAt')
+            .lean();
+
+        // Format the data for the frontend
+        const formattedUsers = users.map(user => ({
+            _id: user._id,
+            name: user.fullName,
+            email: user.email,
+            phone: user.phoneNumber,
+            role: user.role,
+            status: 'active',
+            createdAt: user.createdAt,
+            lastLogin: new Date()
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: formattedUsers
+        });
+    } catch (error) {
+        console.error('Error fetching all profiles:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching profiles',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
