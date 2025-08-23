@@ -184,11 +184,12 @@ function renderCharts(chartsData) {
 async function loadRecentActivities() {
     try {
         const token = localStorage.getItem('adminToken');
-        const response = await fetch('/api/admin/recent-activities', {
+        const response = await fetch('/api/v1/auth/admin/recent-activities', {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: 'include' // Important for sending cookies with cross-origin requests
         });
         
         if (!response.ok) {

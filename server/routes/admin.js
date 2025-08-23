@@ -9,6 +9,7 @@ const {
     logout
 } = require('../controllers/adminAuthController');
 const { getDashboardStats } = require('../controllers/adminController');
+const { getRecentActivities } = require('../controllers/activityController');
 
 // Public routes
 router.post('/login', login);
@@ -27,5 +28,8 @@ router.route('/logout')
 
 // Dashboard stats API - Protected by admin middleware
 router.get('/dashboard-stats', protect, isAdmin, getDashboardStats);
+
+// Recent activities API
+router.get('/recent-activities', protect, isAdmin, getRecentActivities);
 
 module.exports = router;

@@ -85,10 +85,80 @@ function showError(message) {
     }
 }
 
+// Handle signup form submission
+function handleSignupForm() {
+    const signupForm = document.getElementById('adminSignupForm');
+    if (!signupForm) return;
+
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const submitBtn = signupForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        // Basic validation
+        if (!name || !email || !password || !confirmPassword) {
+            showError('Please fill in all fields');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            showError('Passwords do not match');
+            return;
+        }
+        
+        if (password.length < 8) {
+            showError('Password must be at least 8 characters long');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/admin/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed. Please try again.');
+            }
+
+            // Save token and redirect
+            if (data.token) {
+                localStorage.setItem('adminToken', data.token);
+                window.location.href = '/admin/dashboard';
+            } else {
+                throw new Error('Registration successful but no authentication token received');
+            }
+        } catch (error) {
+            console.error('Signup error:', error);
+            showError(error.message || 'Registration failed. Please try again.');
+        } finally {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+}
+
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     handleLoginForm();
+    handleSignupForm();
 });
 
 // Logout function
