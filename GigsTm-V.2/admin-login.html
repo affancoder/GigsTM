@@ -47,6 +47,14 @@
         .tab-content.active {
             display: block;
         }
+        #login-error {
+            display: none;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            color: #b91c1c;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -64,6 +72,7 @@
             
             <!-- Login Form -->
             <div id="login-tab" class="tab-content active">
+                <div id="login-error" style="display: none;"></div>
                 <form id="adminLoginForm" class="space-y-6">
                     <div>
                         <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -89,22 +98,6 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input id="remember-me" name="remember-me" type="checkbox"
-                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-                                Remember me
-                            </label>
-                        </div>
-
-                        <div class="text-sm">
-                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500" id="forgot-password-link">
-                                Forgot password?
-                            </a>
-                        </div>
-                    </div>
-
                     <div>
                         <button type="submit"
                             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -112,7 +105,6 @@
                         </button>
                     </div>
                 </form>
-                <div id="login-error" class="mt-4 text-center text-sm text-red-600 hidden"></div>
             </div>
             
             <!-- Signup Form -->
@@ -167,17 +159,6 @@
                         </div>
                     </div>
 
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input id="terms" name="terms" type="checkbox" required
-                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="terms" class="font-medium text-gray-700">Terms and conditions</label>
-                            <p class="text-gray-500">I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a></p>
-                        </div>
-                    </div>
-
                     <div>
                         <button type="submit"
                             class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -185,60 +166,35 @@
                         </button>
                     </div>
                 </form>
-                <div id="signup-error" class="mt-4 text-center text-sm text-red-600 hidden"></div>
-                <div class="mt-4 text-center text-sm text-gray-600">
-                    Already have an account? <a href="#" onclick="showTab('login')" class="font-medium text-indigo-600 hover:text-indigo-500">Sign in</a>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Forgot Password Modal -->
-    <div id="forgot-password-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Reset Password</h3>
-                <button onclick="document.getElementById('forgot-password-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-500">
-                    <span class="sr-only">Close</span>
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="space-y-4">
-                <p class="text-sm text-gray-500">Enter your email address and we'll send you a link to reset your password.</p>
-                <div>
-                    <label for="reset-email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="reset-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-                <div id="reset-message" class="text-sm hidden"></div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="document.getElementById('forgot-password-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Cancel
-                    </button>
-                    <button type="button" onclick="handlePasswordReset()" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Send Reset Link
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="/js/adminAuthHandler.js"></script>
+    <!-- Include admin authentication handler -->
+    <script src="js/adminAuthHandler.js"></script>
     <script>
         // Tab switching functionality
         function showTab(tabName) {
-            // Hide all tab contents and deactivate all tabs
+            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
+            
+            // Deactivate all tabs
             document.querySelectorAll('.auth-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Show the selected tab content and activate the tab
+            // Show the selected tab content
             document.getElementById(`${tabName}-tab`).classList.add('active');
-            const tabButtons = document.querySelectorAll('.auth-tab');
-            const targetTab = Array.from(tabButtons).find(btn => btn.textContent.toLowerCase().includes(tabName));
-            if (targetTab) targetTab.classList.add('active');
+            
+            // Activate the clicked tab
+            const clickedTab = Array.from(document.querySelectorAll('.auth-tab')).find(tab => 
+                tab.textContent.toLowerCase().includes(tabName)
+            );
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
             
             // Update URL hash
             window.location.hash = tabName;
@@ -252,11 +208,38 @@
             } else {
                 showTab('login');
             }
+            
+            // Check if user is already logged in
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                window.location.href = 'admin-dashboard.html';
+            }
         });
+        
+        // Show error message function
+        function showError(message) {
+            const errorDiv = document.getElementById('login-error');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
         
         // Initialize form submission handlers
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing admin login form...');
+            
+            // Check if user is already logged in
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                window.location.href = 'admin-dashboard.html';
+                return;
+            }
             
             // Login form submission
             const loginForm = document.getElementById('adminLoginForm');

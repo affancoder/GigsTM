@@ -8,6 +8,7 @@ const {
     getMe,
     logout
 } = require('../controllers/adminAuthController');
+const { getDashboardStats } = require('../controllers/adminController');
 
 // Public routes
 router.post('/login', login);
@@ -24,9 +25,7 @@ router.route('/me')
 router.route('/logout')
     .get(logout);
 
-// Admin dashboard route
-router.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../GigsTm-V.2/admin-dashboard.html'));
-});
+// Dashboard stats API - Protected by admin middleware
+router.get('/dashboard-stats', protect, isAdmin, getDashboardStats);
 
 module.exports = router;

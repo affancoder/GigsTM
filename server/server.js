@@ -47,6 +47,9 @@ app.use(cookieParser());
 // Serve static files from the GigsTm-V.2 directory
 app.use(express.static(path.join(__dirname, '../GigsTm-V.2')));
 
+// Serve static files for admin routes
+app.use('/admin', express.static(path.join(__dirname, '../GigsTm-V.2')));
+
 // Log all requests for debugging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -60,7 +63,7 @@ app.use('/api/v1/auth/admin', adminRoutes);
 
 // Admin dashboard route
 app.get('/admin/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '../GigsTm-V.2/admin-dashboard.html'));
+    res.sendFile(path.join(__dirname, '../GigsTm-V.2/admin-dashboard.html'));
 });
 
 // Serve index.html as the default page

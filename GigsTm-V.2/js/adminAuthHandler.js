@@ -1,90 +1,101 @@
 // API base URL
 const API_BASE_URL = '/api/v1';
 
-document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('adminLoginForm');
-    const errorMessage = document.getElementById('login-error'); // Updated ID to match the new HTML
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const submitBtn = loginForm.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            // Basic validation
-            if (!email || !password) {
-                errorMessage.textContent = 'Please enter both email and password';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Signing in...';
-            errorMessage.classList.add('hidden');
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/admin/login`, {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email,
-                        password
-                    })
-                });
-
-                const data = await response.json().catch(() => ({}));
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Login failed. Please check your credentials.');
-                }
-
-                // Save token to localStorage
-                if (data.token) {
-                    localStorage.setItem('adminToken', data.token);
-                    // Redirect to admin dashboard
-                    window.location.href = '/admin/dashboard';
-                } else {
-                    throw new Error('No authentication token received');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                errorMessage.textContent = error.message || 'Login failed. Please try again.';
-                errorMessage.classList.remove('hidden');
-            } finally {
-                // Reset button state
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-        });
+// Check if user is already logged in
+function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    if (token && window.location.pathname.endsWith('admin-login.html')) {
+        window.location.href = '/admin/dashboard';
+    } else if (!token && !window.location.pathname.endsWith('admin-login.html') && 
+              !window.location.pathname.includes('admin-login.html')) {
+        window.location.href = '/admin-login.html';
     }
+}
 
-    // Check if user is already logged in
-    const checkAdminAuth = () => {
-        const token = localStorage.getItem('adminToken');
-        if (token && window.location.pathname === '/admin-login.html') {
-            // Verify token is still valid
-            // If valid, redirect to dashboard
-            window.location.href = '/admin/dashboard.html';
-        } else if (!token && window.location.pathname !== '/admin-login.html') {
-            // If no token and not on login page, redirect to login
-            window.location.href = '/admin-login.html';
+// Handle login form submission
+function handleLoginForm() {
+    const loginForm = document.getElementById('adminLoginForm');
+    const errorMessage = document.getElementById('login-error');
+
+    if (!loginForm) return;
+
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        // Basic validation
+        if (!email || !password) {
+            showError('Please enter both email and password');
+            return;
         }
-    };
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing in...';
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-    // Check auth status on page load
-    checkAdminAuth();
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed. Please check your credentials.');
+            }
+
+            // Save token and redirect
+            if (data.token) {
+                localStorage.setItem('adminToken', data.token);
+                window.location.href = '/admin/dashboard';
+            } else {
+                throw new Error('No authentication token received');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showError(error.message || 'Login failed. Please try again.');
+        } finally {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+}
+
+// Show error message
+function showError(message) {
+    const errorDiv = document.getElementById('login-error');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Check authentication on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuth();
+    handleLoginForm();
 });
 
 // Logout function
-const adminLogout = () => {
+function adminLogout() {
     localStorage.removeItem('adminToken');
-    window.location.href = '/admin-login.html';
-};
+    window.location.href = 'admin-login.html';
+}
+
+// Make logout function available globally
+window.adminLogout = adminLogout;
