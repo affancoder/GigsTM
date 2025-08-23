@@ -369,6 +369,51 @@
             }
         }
 
+        // Handle login form submission
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                const errorElement = document.getElementById('login-error');
+                
+                // Basic validation
+                if (!email || !password) {
+                    errorElement.textContent = 'Please enter both email and password';
+                    errorElement.style.display = 'block';
+                    return;
+                }
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Signing in...';
+                errorElement.style.display = 'none';
+                
+                try {
+                    const result = await handleLogin({ email, password });
+                    
+                    if (result.success) {
+                        // Redirect on successful login
+                        window.location.href = result.redirect || '/index.html';
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    errorElement.textContent = error.message || 'Login failed. Please try again.';
+                    errorElement.style.display = 'block';
+                } finally {
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+        }
+        
         // Handle Forgot Password link click
         document.getElementById('forgot-password-link').addEventListener('click', function(e) {
             e.preventDefault();

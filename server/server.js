@@ -3,22 +3,46 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware - Enable CORS for all routes
-app.use(cors({
-  origin: '*', // Allow all origins in development
+// Configure CORS
+const allowedOrigins = [
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
+  'http://localhost',
+  'http://127.0.0.1',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Content-Length', 'Accept'],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 3600 // 1 hour
+};
+
+app.use(cors(corsOptions));
 
 // Handle preflight requests
 app.options('*', cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Serve static files from the GigsTm-V.2 directory
 app.use(express.static(path.join(__dirname, '../GigsTm-V.2')));
@@ -30,8 +54,14 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/profile', profileRoutes);
+app.use('/api/v1/auth/admin', adminRoutes);
+
+// Admin dashboard route
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '../GigsTm-V.2/admin-dashboard.html'));
+});
 
 // Serve index.html as the default page
 app.get('/', (req, res) => {

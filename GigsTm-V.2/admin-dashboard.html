@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - GigsTM</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            width: 250px;
+        }
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar bg-gray-800 text-white fixed">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold">GigsTM Admin</h1>
+            </div>
+            <nav class="mt-6">
+                <a href="#" class="flex items-center px-6 py-3 text-gray-100 hover:bg-gray-700">
+                    <i class="fas fa-tachometer-alt w-6"></i>
+                    <span class="mx-3">Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-100 hover:bg-gray-700">
+                    <i class="fas fa-users w-6"></i>
+                    <span class="mx-3">Users</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-100 hover:bg-gray-700">
+                    <i class="fas fa-briefcase w-6"></i>
+                    <span class="mx-3">Gigs</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-100 hover:bg-gray-700">
+                    <i class="fas fa-cog w-6"></i>
+                    <span class="mx-3">Settings</span>
+                </a>
+                <a href="#" onclick="adminLogout()" class="flex items-center px-6 py-3 text-gray-100 hover:bg-gray-700">
+                    <i class="fas fa-sign-out-alt w-6"></i>
+                    <span class="mx-3">Logout</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow">
+                <div class="flex justify-between items-center p-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <i class="fas fa-bell text-gray-600 text-xl"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">3</span>
+                        </div>
+                        <div class="flex items-center">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff" alt="Admin" class="w-8 h-8 rounded-full">
+                            <span class="ml-2 text-gray-700">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <!-- Stats Cards -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Total Users</p>
+                                <h3 class="text-2xl font-bold" id="totalUsers">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-briefcase text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Total Gigs</p>
+                                <h3 class="text-2xl font-bold" id="totalGigs">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-tasks text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Pending Requests</p>
+                                <h3 class="text-2xl font-bold" id="pendingRequests">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-chart-line text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-gray-500">Revenue</p>
+                                <h3 class="text-2xl font-bold">$<span id="totalRevenue">0</span></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Recent Activity</h3>
+                        <a href="#" class="text-blue-600 text-sm">View All</a>
+                    </div>
+                    <div class="space-y-4" id="recentActivity">
+                        <!-- Activity items will be dynamically inserted here -->
+                        <div class="animate-pulse flex space-x-4">
+                            <div class="flex-1 space-y-2">
+                                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/adminAuthHandler.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/admin-login.html';
+            }
+
+            // Load dashboard data
+            loadDashboardData();
+        });
+
+        // Function to load dashboard data
+        async function loadDashboardData() {
+            try {
+                // In a real app, you would fetch this data from your API
+                // Example:
+                // const response = await fetch('/api/v1/admin/dashboard');
+                // const data = await response.json();
+                
+                // For demo purposes, we'll use setTimeout to simulate API call
+                setTimeout(() => {
+                    document.getElementById('totalUsers').textContent = '1,234';
+                    document.getElementById('totalGigs').textContent = '567';
+                    document.getElementById('pendingRequests').textContent = '23';
+                    document.getElementById('totalRevenue').textContent = '12,345';
+                    
+                    // Add some sample activity
+                    const activities = [
+                        { user: 'John Doe', action: 'created a new gig', time: '5 minutes ago' },
+                        { user: 'Jane Smith', action: 'updated their profile', time: '1 hour ago' },
+                        { user: 'Admin', action: 'approved a new user', time: '2 hours ago' },
+                        { user: 'Mike Johnson', action: 'completed a purchase', time: '3 hours ago' },
+                        { user: 'Sarah Williams', action: 'sent a message', time: '5 hours ago' }
+                    ];
+                    
+                    const activityHtml = activities.map(activity => `
+                        <div class="flex items-start pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                ${activity.user.charAt(0)}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm">
+                                    <span class="font-semibold">${activity.user}</span> ${activity.action}
+                                </p>
+                                <p class="text-xs text-gray-500">${activity.time}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('recentActivity').innerHTML = activityHtml;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+    </script>
+</body>
+</html>

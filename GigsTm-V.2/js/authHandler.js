@@ -1,5 +1,5 @@
 // API base URL
-const API_BASE_URL = '/api';
+const API_BASE_URL = '/api/v1';
 // expose for inline scripts that may check window.API_BASE_URL
 window.API_BASE_URL = API_BASE_URL;
 
@@ -20,31 +20,52 @@ function requireAuth() {
 // Handle user login
 async function handleLogin(credentials) {
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(credentials)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Login failed');
+        if (!credentials.email || !credentials.password) {
+            throw new Error('Email and password are required');
         }
 
-        // Store token and user data (keep both keys for compatibility)
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                email: credentials.email.trim(),
+                password: credentials.password
+            })
+        });
+
+        const data = await response.json().catch(() => ({
+            message: 'Invalid server response'
+        }));
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed. Please check your credentials.');
+        }
+
+        if (!data.token) {
+            throw new Error('No authentication token received');
+        }
+
+        // Store token and user data
         localStorage.setItem('token', data.token);
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+        }
         
-        return { success: true, data };
+        return { 
+            success: true, 
+            data,
+            redirect: data.redirect || '/index.html' // Default redirect
+        };
     } catch (error) {
         console.error('Login error:', error);
         return { 
             success: false, 
-            message: error.message || 'An error occurred during login' 
+            message: error.message || 'An error occurred during login. Please try again.'
         };
     }
 }

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - GigsTM</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        .auth-container {
+            max-width: 440px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .auth-tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            text-align: center;
+            flex: 1;
+            font-weight: 500;
+            color: #6b7280;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .auth-tab.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+        .auth-tab:not(.active):hover {
+            color: #4b5563;
+            border-bottom-color: #d1d5db;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="auth-container w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Admin Portal</h1>
+                <p class="text-gray-600 mt-2">Manage your admin account</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="showTab('login')">Sign In</div>
+                <div class="auth-tab" onclick="showTab('signup')">Create Account</div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="login-tab" class="tab-content active">
+                <form id="adminLoginForm" class="space-y-6">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" id="login-email" name="email" required
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-2 border"
+                                placeholder="admin@example.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="login-password" name="password" required
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-2 border"
+                                placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox"
+                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500" id="forgot-password-link">
+                                Forgot password?
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+                <div id="login-error" class="mt-4 text-center text-sm text-red-600 hidden"></div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signup-tab" class="tab-content">
+                <form id="adminSignupForm" class="space-y-4">
+                    <div>
+                        <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" id="signup-name" name="name" required
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-2 border"
+                                placeholder="John Doe">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" id="signup-email" name="email" required
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-2 border"
+                                placeholder="admin@example.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="signup-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="signup-password" name="password" required minlength="8"
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-2 border"
+                                placeholder="••••••••">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
+                    </div>
+
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="confirm-password" name="confirmPassword" required minlength="8"
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-2 border"
+                                placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="terms" name="terms" type="checkbox" required
+                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="terms" class="font-medium text-gray-700">Terms and conditions</label>
+                            <p class="text-gray-500">I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Create Account
+                        </button>
+                    </div>
+                </form>
+                <div id="signup-error" class="mt-4 text-center text-sm text-red-600 hidden"></div>
+                <div class="mt-4 text-center text-sm text-gray-600">
+                    Already have an account? <a href="#" onclick="showTab('login')" class="font-medium text-indigo-600 hover:text-indigo-500">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Reset Password</h3>
+                <button onclick="document.getElementById('forgot-password-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-500">
+                    <span class="sr-only">Close</span>
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-500">Enter your email address and we'll send you a link to reset your password.</p>
+                <div>
+                    <label for="reset-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="reset-email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div id="reset-message" class="text-sm hidden"></div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="document.getElementById('forgot-password-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="handlePasswordReset()" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Send Reset Link
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/adminAuthHandler.js"></script>
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents and deactivate all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab content and activate the tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            const tabButtons = document.querySelectorAll('.auth-tab');
+            const targetTab = Array.from(tabButtons).find(btn => btn.textContent.toLowerCase().includes(tabName));
+            if (targetTab) targetTab.classList.add('active');
+            
+            // Update URL hash
+            window.location.hash = tabName;
+        }
+        
+        // Check URL hash on page load
+        window.addEventListener('load', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash === 'signup') {
+                showTab('signup');
+            } else {
+                showTab('login');
+            }
+        });
+        
+        // Initialize form submission handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing admin login form...');
+            
+            // Login form submission
+            const loginForm = document.getElementById('adminLoginForm');
+            if (!loginForm) {
+                console.error('Login form not found!');
+                return;
+            }
+            
+            console.log('Login form found, adding event listener...');
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('Login form submitted');
+                
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const errorElement = document.getElementById('login-error');
+                const originalBtnText = submitBtn.innerHTML;
+                
+                // Basic validation
+                if (!email || !password) {
+                    errorElement.textContent = 'Please enter both email and password';
+                    errorElement.classList.remove('hidden');
+                    return;
+                }
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Signing in...';
+                errorElement.classList.add('hidden');
+                
+                console.log('Sending login request...');
+                try {
+                    const response = await fetch('/api/v1/auth/admin/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password }),
+                        credentials: 'include'
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    let data;
+                    try {
+                        data = await response.json();
+                        console.log('Response data:', data);
+                    } catch (jsonError) {
+                        console.error('Error parsing JSON:', jsonError);
+                        throw new Error('Invalid server response');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || `Login failed with status ${response.status}`);
+                    }
+                    
+                    // Store the token and redirect
+                    if (data.token) {
+                        console.log('Login successful, storing token...');
+                        localStorage.setItem('adminToken', data.token);
+                        window.location.href = '/admin/dashboard';
+                    } else {
+                        console.error('No token in response:', data);
+                        throw new Error('No authentication token received');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    errorElement.textContent = error.message || 'Login failed. Please try again.';
+                    errorElement.classList.remove('hidden');
+                } finally {
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+            
+            console.log('Admin login form initialization complete');
+            
+            // Signup form submission
+            const signupForm = document.getElementById('adminSignupForm');
+            if (signupForm) {
+                signupForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('signup-name').value.trim();
+                    const email = document.getElementById('signup-email').value.trim();
+                    const password = document.getElementById('signup-password').value;
+                    const confirmPassword = document.getElementById('confirm-password').value;
+                    const errorElement = document.getElementById('signup-error');
+                    const submitBtn = signupForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    
+                    // Basic validation
+                    if (!name || !email || !password || !confirmPassword) {
+                        errorElement.textContent = 'All fields are required';
+                        errorElement.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    if (password !== confirmPassword) {
+                        errorElement.textContent = 'Passwords do not match';
+                        errorElement.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    if (password.length < 8) {
+                        errorElement.textContent = 'Password must be at least 8 characters';
+                        errorElement.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = 'Creating Account...';
+                    errorElement.classList.add('hidden');
+                    
+                    try {
+                        console.log('Sending signup request...');
+                        const response = await fetch('/api/v1/admin/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name,
+                                email,
+                                password
+                            }),
+                            credentials: 'include'
+                        });
+                        
+                        console.log('Signup response status:', response.status);
+                        let data;
+                        try {
+                            data = await response.json();
+                            console.log('Signup response data:', data);
+                        } catch (jsonError) {
+                            console.error('Error parsing signup response:', jsonError);
+                            throw new Error('Invalid server response');
+                        }
+                        
+                        if (!response.ok) {
+                            throw new Error(data.message || `Registration failed with status ${response.status}`);
+                        }
+                        
+                        // Redirect to login with success message
+                        showTab('login');
+                        const loginError = document.getElementById('login-error');
+                        loginError.textContent = 'Account created successfully! Please sign in.';
+                        loginError.classList.remove('hidden', 'text-red-600');
+                        loginError.classList.add('text-green-600');
+                        
+                        // Clear form
+                        signupForm.reset();
+                        
+                        // Auto-fill login form
+                        document.getElementById('login-email').value = email;
+                        
+                    } catch (error) {
+                        console.error('Signup error:', error);
+                        errorElement.textContent = error.message || 'Failed to create account. Please try again.';
+                        errorElement.classList.remove('hidden');
+                    } finally {
+                        // Reset button state
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    }
+                });
+            }
+            
+            // Forgot password link
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            if (forgotPasswordLink) {
+                forgotPasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('login-email').value;
+                    const modal = document.getElementById('forgot-password-modal');
+                    const emailInput = document.getElementById('reset-email');
+                    
+                    if (email) {
+                        emailInput.value = email;
+                    }
+                    
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    
+                    // Focus the email input
+                    setTimeout(() => {
+                        emailInput.focus();
+                    }, 100);
+                });
+            }
+        });
+        
+        // Handle password reset
+        async function handlePasswordReset() {
+            const email = document.getElementById('reset-email').value.trim();
+            const messageElement = document.getElementById('reset-message');
+            const modal = document.getElementById('forgot-password-modal');
+            
+            if (!email) {
+                messageElement.textContent = 'Please enter your email address';
+                messageElement.classList.remove('hidden', 'text-green-600');
+                messageElement.classList.add('text-red-600');
+                return;
+            }
+            
+            try {
+                // Call your password reset API here
+                const response = await fetch('/api/v1/admin/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json().catch(() => ({
+                    message: 'Invalid server response'
+                }));
+                
+                if (response.ok) {
+                    messageElement.textContent = data.message || 'Password reset link has been sent to your email.';
+                    messageElement.classList.remove('hidden', 'text-red-600');
+                    messageElement.classList.add('text-green-600');
+                    
+                    // Clear the email field after successful submission
+                    document.getElementById('reset-email').value = '';
+                    
+                    // Close the modal after 3 seconds
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                        messageElement.classList.add('hidden');
+                    }, 3000);
+                } else {
+                    throw new Error(data.message || 'Failed to send reset link');
+                }
+            } catch (error) {
+                console.error('Password reset error:', error);
+                messageElement.textContent = error.message || 'Failed to send reset link. Please try again.';
+                messageElement.classList.remove('hidden', 'text-green-600');
+                messageElement.classList.add('text-red-600');
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('forgot-password-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+                this.classList.remove('flex');
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('forgot-password-modal');
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    required: [true, 'Please add a phone number'],
+    required: [function() { return this.role !== 'admin'; }, 'Please add a phone number'],
     trim: true,
     match: [/^[0-9]{10,15}$/, 'Please add a valid phone number']
   },
